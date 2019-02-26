@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public PlayerMouseLook playerMouseLook;
     public Rigidbody rigbod;
     public Gravity gravity;
-    public BoolVariable debugStuff;
+    public PlayerScriptDebugs debugStuff;
 
     public PlayerStats playerStats;
     
@@ -25,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 playerUp;
     [HideInInspector]
     public Vector3 playerRight;
+
+    RaycastHit hit;
+    public GameObject masterDirectionHolder;
 
     bool moving = false;
     bool jumping = false;
@@ -50,7 +53,12 @@ public class PlayerMovement : MonoBehaviour
         playerUp = playerUpObject.transform.position - playerBody.transform.position;
         playerUp = playerUp.normalized;
 
-        if (debugStuff.Value)
+        if (!playerGravity.isRotating)
+        {
+            CheckRotation();
+        }
+
+        if (debugStuff.debugPlayerMovement)
         {
             Debug.DrawRay(playerBody.transform.position, playerForward * 10, Color.blue);
             Debug.DrawRay(playerBody.transform.position, playerUp * 10, Color.green);
@@ -103,16 +111,18 @@ public class PlayerMovement : MonoBehaviour
                 moving = true;
             }
             
-            if (!moving && !jumping)
+            if (!moving && !jumping && rigbod.velocity.magnitude > 0.001)
             {
-                rigbod.velocity -= rigbod.velocity / 2;
-                if (debugStuff.Value) Debug.Log("slowing player: PlayerMovment.cs");
+                rigbod.velocity -= rigbod.velocity * 0.9f;
+                if (debugStuff.debugPlayerMovement) Debug.Log("slowing player: PlayerMovment.cs");
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetKeyDown(KeyCode.LeftAlt) && !playerGravity.isRotating)
         {
+            playerGravity.isRotating = true;
             playerMouseLook.ChangeGravity();
+            CheckRotation(true);
         }
 
         if (moving) moving = false;
@@ -124,34 +134,12 @@ public class PlayerMovement : MonoBehaviour
 
         isGrounded = true;
         jumping = false;
+        playerGravity.isRotating = false;
 
         rigbod.constraints = RigidbodyConstraints.FreezeRotation;
 
-        transform.rotation = Quaternion.LookRotation(playerGravity.playerForward, -gravity.GravityDirection);
-
-        //switch (gravity.FallDirection)
-        //{
-        //    case FallDirection.XPos:
-        //        transform.SetPositionAndRotation(transform.position, Quaternion.LookRotation(playerForward, -gravity.GravityDirection));
-        //        break;
-        //    case FallDirection.XNeg:
-        //        transform.SetPositionAndRotation(transform.position, Quaternion.Euler(0, 0, -90));
-        //        break;
-        //    case FallDirection.YPos:
-        //        transform.SetPositionAndRotation(transform.position, Quaternion.Euler(180, 0, 0));
-        //        break;
-        //    case FallDirection.YNeg:
-        //        transform.SetPositionAndRotation(transform.position, Quaternion.Euler(0, 0, 0));
-        //        break;
-        //    case FallDirection.ZPos:
-        //        transform.SetPositionAndRotation(transform.position, Quaternion.Euler(-90, 0, 0));
-        //        break;
-        //    case FallDirection.ZNeg:
-        //        transform.SetPositionAndRotation(transform.position, Quaternion.Euler(90, 0, 0));
-        //        break;
-        //    default:
-        //        break;
-        //}
+        playerBody.transform.rotation = Quaternion.LookRotation(playerForward, -gravity.GravityDirection);
+        
     }
 
     public void OnTriggerStay(Collider other)
@@ -166,6 +154,67 @@ public class PlayerMovement : MonoBehaviour
         if (feetTriggerList.Count == 0)
         {
             isGrounded = false;
+        }
+    }
+
+    void CheckRotation(bool useGravity = false)
+    {
+        Physics.Raycast(playerBody.transform.position, playerForward, out hit, 11000f, LayerMask.GetMask("SkyBox"));
+        
+        if (useGravity)
+        {
+            switch (gravity.FallDirection)
+            {
+                case FallDirection.XPos:
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), Vector3.left);
+                    break;
+                case FallDirection.XNeg:
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), Vector3.right);
+                    break;
+                case FallDirection.YPos:
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), Vector3.down);
+                    break;
+                case FallDirection.YNeg:
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), Vector3.up);
+                    break;
+                case FallDirection.ZPos:
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), Vector3.back);
+                    break;
+                case FallDirection.ZNeg:
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), Vector3.forward);
+                    break;
+                case FallDirection.None:
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            switch (hit.collider.gameObject.name)
+            {
+                case "XPos":
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(Vector3.right);
+                    break;
+                case "XNeg":
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(Vector3.left);
+                    break;
+                case "YPos":
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(Vector3.up);
+                    break;
+                case "YNeg":
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(Vector3.down);
+                    break;
+                case "ZPos":
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(Vector3.forward);
+                    break;
+                case "ZNeg":
+                    masterDirectionHolder.transform.rotation = Quaternion.LookRotation(Vector3.back);
+                    break;
+                default:
+                    Debug.Log("O SHIT I NEED AN ADULT: ray cast missed skybox player mouse look");
+                    break;
+            }
         }
     }
 }

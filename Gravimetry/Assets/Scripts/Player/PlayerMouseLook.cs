@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerMouseLook : MonoBehaviour
 {
     public PlayerGravity playerGravity;
-    public PlayerMovement playerMovment;
-    public BoolVariable debugStuff;
+    public PlayerMovement playerMovement;
+    public PlayerScriptDebugs debugStuff;
 
     public float mouseSensitivity = 100.0f;
     public float clampAngle = 80.0f;
@@ -39,7 +39,7 @@ public class PlayerMouseLook : MonoBehaviour
         eyesRight = eyesRight.normalized;
         eyesUp = eyesUpObject.transform.position - playerEyes.transform.position;
 
-        if (debugStuff.Value)
+        if (debugStuff.debugPlayerMouseLook)
         {
             Debug.DrawRay(playerEyes.transform.position, eyesForward * 11000, Color.blue);
             Debug.DrawRay(playerEyes.transform.position, eyesUp * 11000, Color.green);

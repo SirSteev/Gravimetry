@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class PlayerGravity : MonoBehaviour
 {
-    public PlayerMovement playerMovment;
+    public PlayerMovement playerMovement;
     public PlayerMouseLook playerMouseLook;
     public Rigidbody rigbod;
     public Gravity gravity;
-    public BoolVariable debugStuff;
-    public GameObject playerBody;
+    public PlayerScriptDebugs debugStuff;
+    public GameObject playerBodyShell;
     public GameObject playerEyes;
     
     public GameObject masterForwardObject;
@@ -23,48 +23,51 @@ public class PlayerGravity : MonoBehaviour
     public Vector3 playerUp;
     [HideInInspector]
     public Vector3 playerRight;
+
+    //[HideInInspector]
+    public bool isRotating;
     
     void Start()
     {
         gravity.PreviousFallDirection = FallDirection.None;
         gravity.FallDirection = FallDirection.None;
         UpdateGravity(gravity.StartingFallDirection);
+        isRotating = true;
     }
     
     void Update()
     {
-        if (!playerMovment.isGrounded) rigbod.AddForce(gravity.GetForce());
+        if (!playerMovement.isGrounded) rigbod.AddForce(gravity.GetForce());
 
-        playerForward = masterForwardObject.transform.position - playerBody.transform.position;
+        playerForward = masterForwardObject.transform.position - playerBodyShell.transform.position;
         playerForward = playerForward.normalized;
-        playerRight = masterRightObject.transform.position - playerBody.transform.position;
+        playerRight = masterRightObject.transform.position - playerBodyShell.transform.position;
         playerRight = playerRight.normalized;
-        playerUp = masterUpObject.transform.position - playerBody.transform.position;
+        playerUp = masterUpObject.transform.position - playerBodyShell.transform.position;
         playerUp = playerUp.normalized;
 
-        if (debugStuff.Value)
+        if (debugStuff.debugPlayerGravity)
         {
-            Debug.DrawRay(playerBody.transform.position, playerForward * 11000, Color.blue);
-            Debug.DrawRay(playerBody.transform.position, playerUp * 11000, Color.green);
-            Debug.DrawRay(playerBody.transform.position, playerRight * 11000, Color.red);
+            Debug.DrawRay(playerBodyShell.transform.position, playerForward * 11000, Color.blue);
+            Debug.DrawRay(playerBodyShell.transform.position, playerUp * 11000, Color.green);
+            Debug.DrawRay(playerBodyShell.transform.position, playerRight * 11000, Color.red);
         }
 
-        Debug.DrawRay(playerBody.transform.position, Vector3.up * 11000, Color.green);
-        Debug.DrawRay(playerBody.transform.position, -gravity.GravityDirection * 11000, Color.red);
-
-        if (rigbod.velocity.magnitude > 0.1 && !playerMovment.isGrounded)
+        if (rigbod.velocity.magnitude > 0.1 && !playerMovement.isGrounded)
         {
-            Quaternion dirQ = Quaternion.LookRotation(playerForward, -gravity.GravityDirection);
-            if (gravity.FallDirection == FallDirection.ZPos || gravity.FallDirection == FallDirection.ZNeg)
-                dirQ = Quaternion.LookRotation(Vector3.up, -gravity.GravityDirection);
+            Quaternion dirQ = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), -gravity.GravityDirection); // what direction i want
+            
+            Quaternion slerp = Quaternion.Slerp(playerBodyShell.transform.rotation, dirQ, rigbod.velocity.magnitude / gravity.RotationSpeed * Time.deltaTime); // rotates to it over time
 
-            //-------------------------------------------------------------------------------------------------------
+            if (debugStuff.debugPlayerGravity)
+            {
+                Debug.Log("Forward: " + playerMovement.playerUp + " / Up: " + -gravity.GravityDirection);
+                Debug.Log("dirQ: " + dirQ.eulerAngles);
+                Debug.Log("PlayerBody Rotation: " + playerBodyShell.transform.rotation.eulerAngles + " / slerp: " + slerp.eulerAngles);
+            }
 
-            //-------------------------------------------------------------------------------------------------------
-
-            Quaternion slerp = Quaternion.Slerp(transform.rotation, dirQ, rigbod.velocity.magnitude / gravity.RotationSpeed * Time.deltaTime);
-
-            rigbod.MoveRotation(slerp);
+            //rigbod.MoveRotation(slerp);
+            playerBodyShell.transform.rotation = slerp;
         }
     }
     
@@ -75,7 +78,7 @@ public class PlayerGravity : MonoBehaviour
         gravity.PreviousFallDirection = gravity.FallDirection;
         gravity.FallDirection = _direction;
 
-        playerMovment.isGrounded = false;
+        playerMovement.isGrounded = false;
         rigbod.constraints = RigidbodyConstraints.None;
         switch (gravity.FallDirection)
         {

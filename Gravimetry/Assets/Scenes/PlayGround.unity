@@ -184,7 +184,7 @@ GameObject:
   - component: {fileID: 73066152}
   - component: {fileID: 73066157}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,8 +263,8 @@ Transform:
   - {fileID: 922882280}
   - {fileID: 20352119}
   - {fileID: 578851523}
-  m_Father: {fileID: 1222845639}
-  m_RootOrder: 1
+  m_Father: {fileID: 974853692}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &73066157
 BoxCollider:
@@ -764,7 +764,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517797954}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1060,6 +1060,37 @@ Transform:
   m_Father: {fileID: 578851523}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &974853691
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 974853692}
+  m_Layer: 0
+  m_Name: PlayerShell
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &974853692
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974853691}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 73066155}
+  m_Father: {fileID: 1222845639}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &979796079
 GameObject:
   m_ObjectHideFlags: 0
@@ -1183,7 +1214,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 517797955}
-  - {fileID: 73066155}
+  - {fileID: 974853692}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1215,12 +1246,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6393049f73e0d494882b734ceb30083a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovment: {fileID: 1222845643}
+  playerMovement: {fileID: 1222845643}
   playerMouseLook: {fileID: 1222845642}
   rigbod: {fileID: 1222845640}
   gravity: {fileID: 11400000, guid: a873541006e559f45834ecdbc3488b30, type: 2}
-  debugStuff: {fileID: 11400000, guid: a0074e387768a314786b6a23d236d324, type: 2}
-  playerBody: {fileID: 73066150}
+  debugStuff: {fileID: 11400000, guid: 24e3414c7aa7a3e448f4f89da4730c88, type: 2}
+  playerBodyShell: {fileID: 974853691}
   playerEyes: {fileID: 578851522}
   masterForwardObject: {fileID: 462632278}
   masterRightObject: {fileID: 1985537099}
@@ -1228,6 +1259,7 @@ MonoBehaviour:
   playerForward: {x: 0, y: 0, z: 0}
   playerUp: {x: 0, y: 0, z: 0}
   playerRight: {x: 0, y: 0, z: 0}
+  isRotating: 0
 --- !u!114 &1222845642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1241,8 +1273,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerGravity: {fileID: 1222845641}
-  playerMovment: {fileID: 1222845643}
-  debugStuff: {fileID: 11400000, guid: a0074e387768a314786b6a23d236d324, type: 2}
+  playerMovement: {fileID: 1222845643}
+  debugStuff: {fileID: 11400000, guid: 24e3414c7aa7a3e448f4f89da4730c88, type: 2}
   mouseSensitivity: 100
   clampAngle: 80
   playerBody: {fileID: 73066150}
@@ -1266,7 +1298,7 @@ MonoBehaviour:
   playerMouseLook: {fileID: 1222845642}
   rigbod: {fileID: 1222845640}
   gravity: {fileID: 11400000, guid: a873541006e559f45834ecdbc3488b30, type: 2}
-  debugStuff: {fileID: 11400000, guid: a0074e387768a314786b6a23d236d324, type: 2}
+  debugStuff: {fileID: 11400000, guid: 24e3414c7aa7a3e448f4f89da4730c88, type: 2}
   playerStats: {fileID: 11400000, guid: 9d37cfeda0034b64382507aa4c259984, type: 2}
   playerBody: {fileID: 73066150}
   playerEyes: {fileID: 578851522}
@@ -1276,6 +1308,7 @@ MonoBehaviour:
   playerForward: {x: 0, y: 0, z: 0}
   playerUp: {x: 0, y: 0, z: 0}
   playerRight: {x: 0, y: 0, z: 0}
+  masterDirectionHolder: {fileID: 517797954}
   isRamp: 0
   isGrounded: 0
 --- !u!1 &1227339952

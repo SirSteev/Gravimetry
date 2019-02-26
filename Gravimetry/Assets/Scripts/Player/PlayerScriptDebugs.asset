@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 559aae4056d732746a3855c006ea07a9, type: 3}
-  m_Name: Debug Mode
+  m_Script: {fileID: 11500000, guid: 95e903ddb92e27f47afbf5a9e2c56e17, type: 3}
+  m_Name: PlayerScriptDebugs
   m_EditorClassIdentifier: 
-  Description: turns on all debugs
-  Value: 0
+  debugPlayerGravity: 1
+  debugPlayerMovement: 1
+  debugPlayerMouseLook: 0
