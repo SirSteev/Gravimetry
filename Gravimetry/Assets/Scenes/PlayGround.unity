@@ -219,7 +219,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73066150}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -264,7 +264,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 73066150}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -733,7 +733,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 511390632}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1330,7 +1330,9 @@ MonoBehaviour:
   gravity: {fileID: 11400000, guid: a873541006e559f45834ecdbc3488b30, type: 2}
   debugStuff: {fileID: 11400000, guid: 24e3414c7aa7a3e448f4f89da4730c88, type: 2}
   playerStats: {fileID: 11400000, guid: 9d37cfeda0034b64382507aa4c259984, type: 2}
+  playerMaster: {fileID: 1222845638}
   playerBody: {fileID: 73066150}
+  playerBodyShell: {fileID: 974853691}
   playerEyes: {fileID: 578851522}
   playerForwardObject: {fileID: 2075258085}
   playerRightObject: {fileID: 1227339952}
@@ -1508,7 +1510,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1364561693}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

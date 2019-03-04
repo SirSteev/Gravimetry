@@ -543,13 +543,33 @@ namespace PowerGridInventory
                 }
             }
 
-            if (_Blocked && this.View != null) this.HighlightColor = this.View.BlockedColor;
+            if (_Blocked && this.View != null)
+                this.HighlightColor = this.View.BlockedColor;
             else if (Item != null)
             {
                 this.HighlightColor = Item.Highlight;
             }
-            else if (this.View != null) this.HighlightColor = this.View.NormalColor;
-            InitIcon();
+            else if (this.View != null)
+                this.HighlightColor = this.View.NormalColor;
+
+            InitIcon();//---------------------------------------------------------------------
+        }
+
+        public void UpdateSlot()
+        {
+            if (_Blocked && this.View != null)
+            {
+                this.HighlightColor = this.View.BlockedColor;
+            }
+            else if (Item != null)
+            {
+                this.HighlightColor = Item.Highlight;
+                Icon = DefaultIcon;
+            }
+            else if (this.View != null)
+            {
+                this.HighlightColor = this.View.NormalColor;
+            }
         }
 
         /**

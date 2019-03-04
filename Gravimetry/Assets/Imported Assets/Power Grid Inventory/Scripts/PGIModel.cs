@@ -29,7 +29,7 @@ namespace PowerGridInventory
     /// be represented as GameObjects with the <see cref="PGISlotItem"/>
     /// component attached to their root.
     /// </summary>
-    [DisallowMultipleComponent]
+    //[DisallowMultipleComponent]
     //[ExecuteInEditMode]
     [AddComponentMenu("Power Grid Inventory/Model", 10)]
     [Serializable]
@@ -465,6 +465,8 @@ namespace PowerGridInventory
         [PGIFoldedEvent]
         public PGISlotItem.InventorySlotEvent OnEquipItem = new PGISlotItem.InventorySlotEvent();
 
+        
+
         /// <summary>
         /// Invoked after a <see cref="PGISlotItem"/> has been removed from an equipment slot.
         /// This will occur even when dragging an item from the slot but before dropping it
@@ -509,6 +511,8 @@ namespace PowerGridInventory
         [NonSerialized]
         public PGIModel.ModelEvent OnModelChanged = new PGIModel.ModelEvent();
 
+
+
         [SerializeField]
         [FoldFlag("Events")]
         public bool FoldedEvents = false; //used by the inspector
@@ -528,10 +532,11 @@ namespace PowerGridInventory
         [SerializeField]
         [PGIFoldedEvent]
         public UnityEvent OnEndGridResize = new UnityEvent();
-#endregion
+        
+        #endregion
 
 
-#region Private Methods
+        #region Private Methods
         void Awake()
         {
             RefreshGridSize(_GridCellsX, _GridCellsY);

@@ -59,7 +59,6 @@ namespace PowerGridInventory
                         _Model.OnUpdateDirty += this.UpdateView;
                         SetupEquipment();
                     }
-
                     UpdateView();
                 }
                 
@@ -388,7 +387,10 @@ namespace PowerGridInventory
 
         void OnDestroy()
         {
-            if(!ApplicationQuitting) RelenquishAllSlots();
+            if (!ApplicationQuitting)
+            {
+                RelenquishAllSlots();
+            }
         }
 
         void OnEnable()
@@ -570,7 +572,7 @@ namespace PowerGridInventory
             slot.xPos = x;
             slot.yPos = y;
             slot.HighlightColor = NormalColor;
-
+            
             //setup events
             slot.OnBeginDragEvent.RemoveAllListeners();
             slot.OnEndDragEvent.RemoveAllListeners();
@@ -597,22 +599,29 @@ namespace PowerGridInventory
 
         void RelenquishAllSlots()
         {
-            //get a list of all child objects that are slots
-            var list = new List<PGISlot>(transform.childCount);
-            for (int i = 0; i < transform.childCount; i++)
+            try
             {
-                var slot = transform.GetChild(i).GetComponent<PGISlot>();
-                if (slot != null) list.Add(slot);
+                //get a list of all child objects that are slots
+                var list = new List<PGISlot>(transform.childCount);
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    var slot = transform.GetChild(i).GetComponent<PGISlot>();
+                    if (slot != null) list.Add(slot);
+                }
+
+                //relenquish/destroy all found slots
+                for (int i = 0; i < list.Count; i++)
+                    Lazarus.RelenquishToPool(list[i].gameObject);
+
+
+                Slots.Clear();
+                CachedSlotsX = -1;
+                CachedSlotsY = -1;
             }
-
-            //relenquish/destroy all found slots
-            for (int i = 0; i < list.Count; i++)
-                Lazarus.RelenquishToPool(list[i].gameObject);
-
-
-            Slots.Clear();
-            CachedSlotsX = -1;
-            CachedSlotsY = -1;
+            catch (Exception err)
+            {
+                Debug.Log("shit broke");
+            }
         }
 
         /// <summary>
@@ -624,12 +633,14 @@ namespace PowerGridInventory
             RelenquishAllSlots();
 
             //if no model, return
-            if (Model == null || SlotPrefab == null) return;
+            if (Model == null || SlotPrefab == null) return; // --------------------------------------------------------------------
 
             //resize to adjust for new model
             ParentRect = this.GetComponent<RectTransform>();
             CellScaleX = ParentRect.rect.width / Model.GridCellsX;
             CellScaleY = ParentRect.rect.height / Model.GridCellsY;
+
+            Slots.Clear();
 
             //re-activate all old slots (repurposing them in the process)
             //and then create any additional ones we may need
@@ -769,6 +780,8 @@ namespace PowerGridInventory
         /// <param name="eventData">Event data.</param>
         void OnDragBegin(PointerEventData eventData)
         {
+            if (this == null)
+                Debug.Log("view is null 780");
             if (DisableDragging || eventData.button != PointerEventData.InputButton.Left) return;
             //Usually happens when we drag an empty slot
             if (DraggedItem != null) return;
@@ -812,6 +825,8 @@ namespace PowerGridInventory
         /// <param name="eventData">Event data.</param>
         void OnDragEnd(PointerEventData eventData)
         {
+            if (this == null)
+                Debug.Log("view is null 823");
             if (eventData.button != PointerEventData.InputButton.Left) return;
 
             //make sure this view's model's cache is reset
@@ -841,7 +856,8 @@ namespace PowerGridInventory
                 if (DraggedItem.View.DisableWorldDropping)
                 {
                     //not allowed by view, return item to source slot
-                    HackRotateDraggedItem(itemWasRotated);
+                    bool wasRotated = !dropSlot.View.AssignItemToSlot(DraggedItem.Item, sourceSlot, DraggedItem.WasEquipped, DraggedItem.WasStored, DraggedItem.Slot);
+                    HackRotateDraggedItem(wasRotated);
                     ReturnDraggedItemToSlot();
                     OnDragEndInvalid.Invoke(eventData, item, sourceSlot, enteredGO);
                     DeselectAllViews();
@@ -876,12 +892,13 @@ namespace PowerGridInventory
                 }
             }
             else dropSlot = enteredGO.GetComponent<PGISlot>();
+            
 
-
-            if (dropSlot == null || dropSlot.View == null || dropSlot.View.DisableDropping)
+            if (dropSlot == null || dropSlot.View == null || dropSlot.View.DisableDropping || dropSlot.View.Model.gameObject == DraggedItem.Item.gameObject)
             {
                 //Dropped on UI element
-                HackRotateDraggedItem(itemWasRotated);
+                //bool wasRotated = !dropSlot.View.AssignItemToSlot(DraggedItem.Item, sourceSlot, DraggedItem.WasEquipped, DraggedItem.WasStored, DraggedItem.Slot);
+                HackRotateDraggedItem(wasItemRotated);
                 ReturnDraggedItemToSlot();
                 OnDragEndInvalid.Invoke(eventData, item, sourceSlot, enteredGO);
                 DraggedItem.Item.OnDragEnd.Invoke(item, sourceSlot.Model, sourceSlot);
@@ -894,7 +911,9 @@ namespace PowerGridInventory
                 if (!dropSlot.IsEquipmentSlot &&
                     (DraggedItem.Item.CellHeight > dropSlot.Model.GridCellsY || DraggedItem.Item.CellWidth > dropSlot.Model.GridCellsX))
                 {
-                    HackRotateDraggedItem(itemWasRotated);
+                    bool wasRotated = !dropSlot.View.AssignItemToSlot(DraggedItem.Item, sourceSlot, DraggedItem.WasEquipped, DraggedItem.WasStored, DraggedItem.Slot);
+                    HackRotateDraggedItem(wasRotated);
+
                     ReturnDraggedItemToSlot();
                     OnDragEndInvalid.Invoke(eventData, item, sourceSlot, enteredGO);
                     DraggedItem.Item.OnDragEnd.Invoke(item, sourceSlot.Model, sourceSlot);
@@ -916,11 +935,8 @@ namespace PowerGridInventory
                                                           DraggedItem.Slot))
                         {
                             //failed to assign item, revert
-                            Debug.Log("DOUBLE DING");
-
-                            // get the view that the item came from and se if it was rotated....----------------------------------------------------------------------
-
-                            HackRotateDraggedItem(itemWasRotated);
+                            bool wasRotated = !dropSlot.View.AssignItemToSlot(DraggedItem.Item, sourceSlot, DraggedItem.WasEquipped, DraggedItem.WasStored, DraggedItem.Slot);
+                            HackRotateDraggedItem(wasRotated);
                             ReturnDraggedItemToSlot();
                             OnDragEndInvalid.Invoke(eventData, item, sourceSlot, enteredGO);
                             DraggedItem.Item.OnDragEnd.Invoke(item, sourceSlot.Model, sourceSlot);
@@ -935,9 +951,13 @@ namespace PowerGridInventory
                     else
                     {
                         //source and dest slots are same, revert
-                        
 
-                        if (dropSlot.HighlightColor == InvalidColor) HackRotateDraggedItem(itemWasRotated);
+
+                        if (dropSlot.HighlightColor == InvalidColor)
+                        {
+                            bool wasRotated = !dropSlot.View.AssignItemToSlot(DraggedItem.Item, sourceSlot, DraggedItem.WasEquipped, DraggedItem.WasStored, DraggedItem.Slot);
+                            HackRotateDraggedItem(wasRotated);
+                        }
 
                         ReturnDraggedItemToSlot();
 
@@ -959,10 +979,11 @@ namespace PowerGridInventory
             DeselectAllViews();
             DraggedItem = null;
             ResetDragIcon(DragIcon);
-            itemWasRotated = false;
+            wasItemRotated = false;
         }
 
-        bool itemWasRotated = false;
+        bool wasItemRotated = false;
+
         void HackRotateDraggedItem(bool rotated)
         {
             if (rotated)
@@ -984,15 +1005,15 @@ namespace PowerGridInventory
                 if (DraggedItem.Item.RotatedDir == PGISlotItem.RotateDirection.None) DraggedItem.Item.Rotate(PGISlotItem.RotateDirection.CW);
                 else DraggedItem.Item.Rotate(PGISlotItem.RotateDirection.None);
 
-                if (itemWasRotated) itemWasRotated = false;
-                else itemWasRotated = true;
 
+                if (wasItemRotated) wasItemRotated = false;
+                else wasItemRotated = true;
                 // fix scale thing
                 //Debug.Log("Fix scale thing: PGIView.cs");
                 //-----------------------------------------------------------------------------
                 //slot.Icon
                 //-----------------------------------------------------------------------------
-                
+
 
                 SetDragIcon(DragIcon, DraggedItem, slot);
                 OnDrag(eventData);

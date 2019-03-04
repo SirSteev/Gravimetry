@@ -46,27 +46,39 @@ public class PlayerGravity : MonoBehaviour
         playerUp = masterUpObject.transform.position - playerBodyShell.transform.position;
         playerUp = playerUp.normalized;
 
+
+        float dot = Vector3.Dot(-gravity.GravityDirection, playerMovement.playerForward) / gravity.GravityDirection.magnitude;
+
+        Vector3 newPos = playerMovement.playerForwardObject.transform.position + -gravity.GravityDirection * dot;
+
+        Vector3 newForward = newPos - playerBodyShell.transform.position;
+        newForward = newForward.normalized;
+
+
         if (debugStuff.debugPlayerGravity)
         {
-            Debug.DrawRay(playerBodyShell.transform.position, playerForward * 11000, Color.blue);
-            Debug.DrawRay(playerBodyShell.transform.position, playerUp * 11000, Color.green);
-            Debug.DrawRay(playerBodyShell.transform.position, playerRight * 11000, Color.red);
+            Debug.DrawRay(playerBodyShell.transform.position, newForward * 11000, Color.blue);
+            Debug.DrawRay(playerBodyShell.transform.position, -gravity.GravityDirection * 11000, Color.green);
+            Debug.DrawRay(playerBodyShell.transform.position, playerMovement.playerRight * 11000, Color.red);
+            Debug.DrawRay(playerBodyShell.transform.position, playerMovement.playerForward * 11000, Color.cyan);
+            Debug.DrawRay(playerMovement.playerForwardObject.transform.position, -gravity.GravityDirection * dot, Color.yellow);
         }
 
         if (rigbod.velocity.magnitude > 0.1 && !playerMovement.isGrounded)
         {
-            Quaternion dirQ = Quaternion.LookRotation(gravity.GetPreviousFallDirectionVector(), -gravity.GravityDirection); // what direction i want
+            
+
+            Quaternion dirQ = Quaternion.LookRotation(newForward, -gravity.GravityDirection); // what direction i want
             
             Quaternion slerp = Quaternion.Slerp(playerBodyShell.transform.rotation, dirQ, rigbod.velocity.magnitude / gravity.RotationSpeed * Time.deltaTime); // rotates to it over time
 
             if (debugStuff.debugPlayerGravity)
             {
-                Debug.Log("Forward: " + playerMovement.playerUp + " / Up: " + -gravity.GravityDirection);
+                Debug.Log("Forward: " + newForward + " / Up: " + -gravity.GravityDirection);
                 Debug.Log("dirQ: " + dirQ.eulerAngles);
                 Debug.Log("PlayerBody Rotation: " + playerBodyShell.transform.rotation.eulerAngles + " / slerp: " + slerp.eulerAngles);
             }
-
-            //rigbod.MoveRotation(slerp);
+            
             playerBodyShell.transform.rotation = slerp;
         }
     }

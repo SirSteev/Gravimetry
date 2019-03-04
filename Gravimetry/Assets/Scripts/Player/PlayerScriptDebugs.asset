@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: PlayerScriptDebugs
   m_EditorClassIdentifier: 
   debugPlayerGravity: 1
-  debugPlayerMovement: 1
+  debugPlayerMovement: 0
   debugPlayerMouseLook: 0
