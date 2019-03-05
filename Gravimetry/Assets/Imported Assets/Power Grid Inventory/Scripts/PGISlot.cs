@@ -552,18 +552,33 @@ namespace PowerGridInventory
             else if (this.View != null)
                 this.HighlightColor = this.View.NormalColor;
 
-            InitIcon();//---------------------------------------------------------------------
+            InitIcon();
         }
 
         public void UpdateSlot()
         {
-            if (_Blocked && this.View != null)
+            if (_Blocked && Item != null)
             {
                 this.HighlightColor = this.View.BlockedColor;
+                Icon = null;
+                Icon = Item.Icon;
+            }
+            else if (_Blocked && this.View != null)
+            {
+                this.HighlightColor = this.View.BlockedColor;
+                Icon = null;
+                Icon = DefaultIcon;
             }
             else if (Item != null)
             {
                 this.HighlightColor = Item.Highlight;
+                Icon = null;
+                Icon = Item.Icon;
+            }
+            else if (!_Blocked && Item == null)
+            {
+                this.HighlightColor = this.View.NormalColor;
+                Icon = null;
                 Icon = DefaultIcon;
             }
             else if (this.View != null)
@@ -850,7 +865,7 @@ namespace PowerGridInventory
         /// <param name="eventData">Event data.</param>
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
-            if (Item != null)
+            if (Item != null && !_Blocked)
             {
                 OnBeginDragEvent.Invoke(eventData);
                 InvalidateClick = true;

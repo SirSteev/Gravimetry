@@ -24,8 +24,7 @@ public class CloseContainerWindow : MonoBehaviour
     {
         Debug.Log("Closeing");
         gameObject.SetActive(false);
-
-
+        
         DefaultWindowSizes();
     }
 

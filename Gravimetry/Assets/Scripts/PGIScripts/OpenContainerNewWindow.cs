@@ -12,12 +12,12 @@ public class OpenContainerNewWindow : MonoBehaviour
 
     public GameObject openContainerPreFab;
     public GameObject playerInventoryObject;
-
-    ContainerHandeler containerHandeler;
-    ItemContainer itemContainer;
+    
     RectTransform panelRect;
 
     const int CONTAINERCOUNT = 2;
+    ContainerHandeler[] containerHandelers;
+    ItemContainer[] itemContainers;
     public GameObject[] openContainers;
     public GameObject[] openContainerWindows;
     int containerNdx = 0;
@@ -27,6 +27,8 @@ public class OpenContainerNewWindow : MonoBehaviour
     {
         openContainers = new GameObject[CONTAINERCOUNT];
         openContainerWindows = new GameObject[CONTAINERCOUNT];
+        containerHandelers = new ContainerHandeler[CONTAINERCOUNT];
+        itemContainers = new ItemContainer[CONTAINERCOUNT];
     }
 
     private void Update()
@@ -40,9 +42,17 @@ public class OpenContainerNewWindow : MonoBehaviour
     
     public void OpenContainer(PointerEventData eventData, PGISlot slot)
     {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        
+        if (slot.Item.gameObject.transform.parent != null && slot.Item.gameObject.transform.parent.gameObject.GetComponent<ContainerHandeler>() != null)
+        {
+            Debug.Log("IM IN A BOX NO CAN OPEN");
+            return;
+        }
+
         Debug.Log("CLICK");
         timer = maxTimer;
-
+        
         if (eventData.button == PointerEventData.InputButton.Left) clicks++;
 
         if (clicks >= 2)
@@ -65,12 +75,14 @@ public class OpenContainerNewWindow : MonoBehaviour
 
                         // resize window
                         RectTransform containerRect = openContainerWindows[ndx].GetComponent<RectTransform>();
-                        containerRect.sizeDelta += itemContainer.sizeDelta;
+                        containerRect.sizeDelta += itemContainers[ndx].sizeDelta;
                         containerRect.sizeDelta -= new Vector2(0, 50);
 
                         panelRect = openContainerWindows[ndx].GetComponent<CloseContainerWindow>().panelRect;
-                        panelRect.sizeDelta += new Vector2(itemContainer.sizeDelta.x, 0);
-
+                        panelRect.sizeDelta += new Vector2(itemContainers[ndx].sizeDelta.x, 0);
+                        
+                        containerHandelers[ndx].closeContainerWindow = openContainerWindows[ndx].GetComponent<CloseContainerWindow>();
+                        
                         openContainerWindows[ndx].SetActive(true);
                         openContainerWindows[ndx].GetComponent<CloseContainerWindow>().icon.sprite = null;
                         openContainerWindows[ndx].GetComponent<CloseContainerWindow>().icon.sprite = slot.Item.Icon;
@@ -79,6 +91,13 @@ public class OpenContainerNewWindow : MonoBehaviour
                 else
                 {
                     Debug.Log("WORKS");
+
+                    for (int i = 0; i < openContainerWindows.Length; i++)
+                    {
+                        if (openContainerWindows[i] == null) break;
+                        if (!openContainerWindows[i].activeInHierarchy) containerNdx = i;
+                    }
+
                     _slot = slot;
                     
                     openContainers[containerNdx] = _slot.Item.gameObject;
@@ -126,17 +145,22 @@ public class OpenContainerNewWindow : MonoBehaviour
 
         windowSlot.Item.TriggerEquipEvents(_slot.Model, windowSlot);
 
-        containerHandeler = _slot.Item.gameObject.GetComponent<ContainerHandeler>();
-        itemContainer = closeContainerWindow.slot.gameObject.GetComponent<ItemContainer>();
+        containerHandelers[containerNdx] = _slot.Item.gameObject.GetComponent<ContainerHandeler>();
+        itemContainers[containerNdx] = closeContainerWindow.slot.gameObject.GetComponent<ItemContainer>();
+
+        containerHandelers[containerNdx].closeContainerWindow = closeContainerWindow;
 
         // resize window
         closeContainerWindow.DefaultWindowSizes();
         
-        closeContainerWindow.windowRect.sizeDelta += itemContainer.sizeDelta;
+        closeContainerWindow.windowRect.sizeDelta += itemContainers[containerNdx].sizeDelta;
         closeContainerWindow.windowRect.sizeDelta -= new Vector2(0, 50);
         
         panelRect = openContainerWindows[containerNdx].GetComponent<CloseContainerWindow>().panelRect;
-        panelRect.sizeDelta += new Vector2(itemContainer.sizeDelta.x, 0);
+        panelRect.sizeDelta += new Vector2(itemContainers[containerNdx].sizeDelta.x, 0);
+        
+        if (!openContainerWindows[containerNdx].activeInHierarchy)
+            openContainerWindows[containerNdx].SetActive(true);
 
         closeContainerWindow.icon.sprite = null;
         closeContainerWindow.icon.sprite = _slot.Item.Icon;

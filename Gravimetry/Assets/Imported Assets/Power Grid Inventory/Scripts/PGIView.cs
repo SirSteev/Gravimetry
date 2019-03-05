@@ -1000,8 +1000,11 @@ namespace PowerGridInventory
         /// <param name="eventData">Event data.</param>
         void OnClickHack(PointerEventData eventData, PGISlot slot)
         {
+            
+
             if (eventData.button == PointerEventData.InputButton.Right && DraggedItem != null && slot != null)
             {
+                Debug.Log("Ding");
                 if (DraggedItem.Item.RotatedDir == PGISlotItem.RotateDirection.None) DraggedItem.Item.Rotate(PGISlotItem.RotateDirection.CW);
                 else DraggedItem.Item.Rotate(PGISlotItem.RotateDirection.None);
 

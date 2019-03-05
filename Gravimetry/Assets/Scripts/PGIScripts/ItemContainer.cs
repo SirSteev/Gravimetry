@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using PowerGridInventory;
 
 public class ItemContainer : MonoBehaviour
@@ -38,16 +39,18 @@ public class ItemContainer : MonoBehaviour
             }
         }
     }
-
-    
-
     public void OnEquip()
     {
-        Debug.Log("TRIGGERED");
+        //Debug.Log("TRIGGERED");
 
         containerHandeler = containerSlot.Item.gameObject.GetComponent<ContainerHandeler>();
 
         //containerGridFramesObject.GetComponent<RectTransform>().sizeDelta = new Vector2(containerHandeler.GetWidth(slotScale, slotSpacing), containerHandeler.GetHeight(slotScale, slotSpacing));
+
+        for (int ndx = 0; ndx < gridFrames.Count; ndx++)
+        {
+            gridFrames[ndx].SetActive(false);
+        }
 
         for (int ndx = 0; ndx < containerHandeler.models.Count; ndx++)
         {
@@ -59,6 +62,7 @@ public class ItemContainer : MonoBehaviour
                 gridPGIViews.Add(autoSquareSlots[ndx].View);
             }
 
+            gridFrames[ndx].SetActive(true);
             gridPGIViews[ndx].Model = containerHandeler.models[ndx];
 
             Vector2 tempDelta;
@@ -70,9 +74,7 @@ public class ItemContainer : MonoBehaviour
             //------
             
             autoSquareSlots[ndx].UpdateView();
-
-            gridPGIViews[ndx].DisableRendering = true;
-            gridPGIViews[ndx].DisableRendering = false;
+            containerSlot.UpdateSlot();
         }
         sizeDeltaSet = true;
     }
@@ -91,6 +93,10 @@ public class ItemContainer : MonoBehaviour
         containerHandeler = null;
 
         containerSlot.Blocked = true;
+
+        Sprite temp = containerSlot.Icon;
+        containerSlot.UpdateSlot();
+
         lockTimer = lockTimerMax;
     }
 }
