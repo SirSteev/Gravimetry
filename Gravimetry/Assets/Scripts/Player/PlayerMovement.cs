@@ -133,14 +133,17 @@ public class PlayerMovement : MonoBehaviour
         {
             if (debugStuff.debugPlayerMovement) Debug.Log("grounded and not upright");
 
-            float dot = Vector3.Dot(-gravity.GravityDirection, playerForward) / -gravity.GravityDirection.magnitude;
-            Vector3 newPos = playerForwardObject.transform.position + -gravity.GravityDirection * dot;
-            Vector3 newForward = playerBodyShell.transform.position - newPos;
+            float dot = Vector3.Dot(-gravity.GravityDirection, playerForward) / gravity.GravityDirection.magnitude;
+            Vector3 newPos = playerForwardObject.transform.position + (gravity.GravityDirection * dot);
+            Vector3 newForward = newPos - playerBodyShell.transform.position;
             newForward = newForward.normalized;
 
             Quaternion dirQ = Quaternion.LookRotation(newForward, -gravity.GravityDirection); // what direction i want
             Quaternion slerp = Quaternion.Slerp(playerBodyShell.transform.rotation, dirQ, rigbod.velocity.magnitude / gravity.RotationSpeed * Time.deltaTime); // rotates to it over time
-            playerBodyShell.transform.rotation = slerp;
+
+
+            if (dot > 0.01)
+                playerBodyShell.transform.rotation = slerp;
         }
     }
 

@@ -69,33 +69,40 @@ public class OpenContainerNewWindow : MonoBehaviour
                 {
                     Debug.Log("CONTAINER ALLREADY OPEN");
 
+                    openContainerWindows[ndx].transform.SetSiblingIndex(openContainerWindows[ndx].transform.parent.transform.childCount - 1);
+
                     if (!openContainerWindows[ndx].activeInHierarchy)
                     {
                         Debug.Log("CONTAINER WINDOW WAS CLOSED");
 
+                        CloseContainerWindow closeContainerWindow = openContainerWindows[ndx].GetComponent<CloseContainerWindow>();
+
                         // resize window
+                        closeContainerWindow.DefaultWindowSizes();
+
                         RectTransform containerRect = openContainerWindows[ndx].GetComponent<RectTransform>();
                         containerRect.sizeDelta += itemContainers[ndx].sizeDelta;
-                        containerRect.sizeDelta -= new Vector2(0, 50);
 
-                        panelRect = openContainerWindows[ndx].GetComponent<CloseContainerWindow>().panelRect;
+                        panelRect = closeContainerWindow.panelRect;
                         panelRect.sizeDelta += new Vector2(itemContainers[ndx].sizeDelta.x, 0);
                         
-                        containerHandelers[ndx].closeContainerWindow = openContainerWindows[ndx].GetComponent<CloseContainerWindow>();
+                        containerHandelers[ndx].closeContainerWindow = closeContainerWindow;
                         
                         openContainerWindows[ndx].SetActive(true);
-                        openContainerWindows[ndx].GetComponent<CloseContainerWindow>().icon.sprite = null;
-                        openContainerWindows[ndx].GetComponent<CloseContainerWindow>().icon.sprite = slot.Item.Icon;
+                        closeContainerWindow.icon.sprite = null;
+                        closeContainerWindow.icon.sprite = slot.Item.Icon;
                     }
                 }
                 else
                 {
                     Debug.Log("WORKS");
 
-                    for (int i = 0; i < openContainerWindows.Length; i++)
+                    if (openContainerWindows[containerNdx] != null)
                     {
-                        if (openContainerWindows[i] == null) break;
-                        if (!openContainerWindows[i].activeInHierarchy) containerNdx = i;
+                        for (int i = 0; i < openContainerWindows.Length; i++)
+                        {
+                            if (!openContainerWindows[i].activeInHierarchy) containerNdx = i;
+                        }
                     }
 
                     _slot = slot;
@@ -154,7 +161,7 @@ public class OpenContainerNewWindow : MonoBehaviour
         closeContainerWindow.DefaultWindowSizes();
         
         closeContainerWindow.windowRect.sizeDelta += itemContainers[containerNdx].sizeDelta;
-        closeContainerWindow.windowRect.sizeDelta -= new Vector2(0, 50);
+        //closeContainerWindow.windowRect.sizeDelta -= new Vector2(0, 50);
         
         panelRect = openContainerWindows[containerNdx].GetComponent<CloseContainerWindow>().panelRect;
         panelRect.sizeDelta += new Vector2(itemContainers[containerNdx].sizeDelta.x, 0);
@@ -164,6 +171,8 @@ public class OpenContainerNewWindow : MonoBehaviour
 
         closeContainerWindow.icon.sprite = null;
         closeContainerWindow.icon.sprite = _slot.Item.Icon;
+
+        openContainerWindows[containerNdx].transform.SetSiblingIndex(openContainerWindows[containerNdx].transform.parent.transform.childCount - 1);
 
         IncrementNdx();
     }

@@ -548,6 +548,8 @@ namespace PowerGridInventory
             else if (Item != null)
             {
                 this.HighlightColor = Item.Highlight;
+                Icon = null;
+                Icon = Item.Icon;
             }
             else if (this.View != null)
                 this.HighlightColor = this.View.NormalColor;

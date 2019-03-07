@@ -54,6 +54,7 @@ public class Gravity : ScriptableObject
                 vector = Vector3.forward;
                 break;
             case FallDirection.None:
+                vector = Vector3.up;
                 break;
             default:
                 break;

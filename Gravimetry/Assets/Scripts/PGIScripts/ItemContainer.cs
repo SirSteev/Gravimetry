@@ -23,8 +23,8 @@ public class ItemContainer : MonoBehaviour
     public float lockTimerMax;
     public float lockTimer;
 
-    public Vector2 sizeDelta;
-    bool sizeDeltaSet = false;
+    public Vector2 sizeDelta = Vector2.zero;
+    //bool sizeDeltaSet = false;
 
     public void FixedUpdate()
     {
@@ -64,19 +64,20 @@ public class ItemContainer : MonoBehaviour
 
             gridFrames[ndx].SetActive(true);
             gridPGIViews[ndx].Model = containerHandeler.models[ndx];
-
-            Vector2 tempDelta;
-            //------
-            gridFrameRectTransforms[ndx].sizeDelta = tempDelta = new Vector2(containerHandeler.models[ndx].GridCellsX * slotScale, containerHandeler.models[ndx].GridCellsY * slotScale);
+            
+            gridFrameRectTransforms[ndx].sizeDelta = new Vector2(containerHandeler.models[ndx].GridCellsX * slotScale, containerHandeler.models[ndx].GridCellsY * slotScale);
             gridFrameRectTransforms[ndx].anchoredPosition = new Vector2((containerHandeler.modelStartPositions[ndx].x * (slotScale + slotSpacing)) + gridFrameRectTransforms[ndx].sizeDelta.x / 2,
                                                                        -((containerHandeler.modelStartPositions[ndx].y * (slotScale + slotSpacing)) + gridFrameRectTransforms[ndx].sizeDelta.y / 2));
-            if (!sizeDeltaSet) sizeDelta += tempDelta;
-            //------
-            
+
+            Vector2 temp = new Vector2(containerHandeler.models[ndx].GridCellsX, containerHandeler.models[ndx].GridCellsY) * slotScale + containerHandeler.modelStartPositions[ndx] * slotScale;
+
+            if (temp.x > sizeDelta.x) sizeDelta.x = temp.x;
+            if (temp.y > sizeDelta.y) sizeDelta.y = temp.y;
+
             autoSquareSlots[ndx].UpdateView();
             containerSlot.UpdateSlot();
         }
-        sizeDeltaSet = true;
+        sizeDelta -= new Vector2(0, 50);
     }
 
     public void OnUnEquip()

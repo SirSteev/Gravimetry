@@ -48,9 +48,7 @@ public class PlayerGravity : MonoBehaviour
 
 
         float dot = Vector3.Dot(-gravity.GravityDirection, playerMovement.playerForward) / gravity.GravityDirection.magnitude;
-
-        Vector3 newPos = playerMovement.playerForwardObject.transform.position + -gravity.GravityDirection * dot;
-
+        Vector3 newPos = playerMovement.playerForwardObject.transform.position + (gravity.GravityDirection * dot);
         Vector3 newForward = newPos - playerBodyShell.transform.position;
         newForward = newForward.normalized;
 
