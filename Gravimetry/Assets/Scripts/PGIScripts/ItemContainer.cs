@@ -19,31 +19,23 @@ public class ItemContainer : MonoBehaviour
 
     public float slotScale = 25f;
     public float slotSpacing = 0.5f;
-
-    public float lockTimerMax;
-    public float lockTimer;
+    
 
     public Vector2 sizeDelta = Vector2.zero;
     //bool sizeDeltaSet = false;
+    
 
-    public void FixedUpdate()
-    {
-        if (containerSlot.Blocked)
-        {
-            lockTimer -= Time.deltaTime;
-
-            if (lockTimer <= 0)
-            {
-                containerSlot.Blocked = false;
-                containerSlot.UpdateSlot();
-            }
-        }
-    }
     public void OnEquip()
     {
         //Debug.Log("TRIGGERED");
 
         containerHandeler = containerSlot.Item.gameObject.GetComponent<ContainerHandeler>();
+
+        if (containerHandeler == null)
+        {
+            Debug.Log("NULL Container.... its not one");
+            return;
+        }
 
         //containerGridFramesObject.GetComponent<RectTransform>().sizeDelta = new Vector2(containerHandeler.GetWidth(slotScale, slotSpacing), containerHandeler.GetHeight(slotScale, slotSpacing));
 
@@ -82,6 +74,12 @@ public class ItemContainer : MonoBehaviour
 
     public void OnUnEquip()
     {
+        if (containerHandeler == null)
+        {
+            Debug.Log("NULL Container.... its not one");
+            return;
+        }
+
         containerGridFramesObject.GetComponent<RectTransform>().sizeDelta = Vector2.zero;
 
         for (int ndx = 0; ndx < containerHandeler.models.Count; ndx++)
@@ -92,12 +90,7 @@ public class ItemContainer : MonoBehaviour
             gridPGIViews[ndx].Model = null;
         }
         containerHandeler = null;
-
-        containerSlot.Blocked = true;
-
-        Sprite temp = containerSlot.Icon;
+        
         containerSlot.UpdateSlot();
-
-        lockTimer = lockTimerMax;
     }
 }

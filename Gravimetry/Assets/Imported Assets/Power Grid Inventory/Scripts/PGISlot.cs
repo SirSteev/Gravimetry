@@ -544,7 +544,12 @@ namespace PowerGridInventory
             }
 
             if (_Blocked && this.View != null)
+            {
+                Icon = null;
+                Icon = Item != null ? Item.Icon : DefaultIcon;
+
                 this.HighlightColor = this.View.BlockedColor;
+            }
             else if (Item != null)
             {
                 this.HighlightColor = Item.Highlight;
@@ -552,7 +557,10 @@ namespace PowerGridInventory
                 Icon = Item.Icon;
             }
             else if (this.View != null)
+            {
                 this.HighlightColor = this.View.NormalColor;
+
+            }
 
             InitIcon();
         }

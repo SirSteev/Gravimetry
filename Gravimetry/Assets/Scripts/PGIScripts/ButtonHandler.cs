@@ -13,6 +13,8 @@ public class ButtonHandler : MonoBehaviour
         {
             int ndx = buttons.IndexOf(button);
 
+            if (options[ndx].activeInHierarchy) return;
+
             foreach (var frame in options)
             {
                 frame.SetActive(false);

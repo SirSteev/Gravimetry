@@ -64,6 +64,13 @@ namespace PowerGridInventory
         public Sprite Icon;
 
         /// <summary>
+        /// The sprite that represents this item when dragged.
+        /// </summary>
+        [Tooltip("The sprite that represents this item when dragged.")]
+        [HideInInspector]
+        public Sprite DragIcon;
+
+        /// <summary>
         /// 3D mesh that represents this item in an inventory view.
         /// </summary>
         [Tooltip("The 3D mesh that represents ths item in an inventory view.")]
@@ -373,6 +380,12 @@ namespace PowerGridInventory
 #else
             
 #endif
+        }
+
+        void Start()
+        {
+            if (DragIcon == null)
+                DragIcon = Icon;
         }
 #endregion
 

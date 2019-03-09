@@ -6,29 +6,29 @@ using PowerGridInventory;
 
 public class OpenContainerNewWindow : MonoBehaviour
 {
-    public int clicks;
-    public float timer;
-    public float maxTimer = 0.5f;
+    int clicks;
+    float timer;
+    float maxTimer = 0.5f;
 
     public GameObject openContainerPreFab;
     public GameObject playerInventoryObject;
     
     RectTransform panelRect;
 
-    const int CONTAINERCOUNT = 2;
+    public int windowCount = 2;
     ContainerHandeler[] containerHandelers;
     ItemContainer[] itemContainers;
-    public GameObject[] openContainers;
-    public GameObject[] openContainerWindows;
+    GameObject[] openContainers;
+    GameObject[] openContainerWindows;
     int containerNdx = 0;
     PGISlot _slot;
 
     private void Start()
     {
-        openContainers = new GameObject[CONTAINERCOUNT];
-        openContainerWindows = new GameObject[CONTAINERCOUNT];
-        containerHandelers = new ContainerHandeler[CONTAINERCOUNT];
-        itemContainers = new ItemContainer[CONTAINERCOUNT];
+        openContainers = new GameObject[windowCount];
+        openContainerWindows = new GameObject[windowCount];
+        containerHandelers = new ContainerHandeler[windowCount];
+        itemContainers = new ItemContainer[windowCount];
     }
 
     private void Update()
@@ -101,16 +101,20 @@ public class OpenContainerNewWindow : MonoBehaviour
                     {
                         for (int i = 0; i < openContainerWindows.Length; i++)
                         {
-                            if (!openContainerWindows[i].activeInHierarchy) containerNdx = i;
+                            if (!openContainerWindows[i].activeInHierarchy)
+                            {
+                                containerNdx = i;
+                                break;
+                            }
                         }
                     }
 
                     _slot = slot;
                     
                     openContainers[containerNdx] = _slot.Item.gameObject;
+
                     if (openContainerWindows[containerNdx] == null)
                         openContainerWindows[containerNdx] = Instantiate(openContainerPreFab, playerInventoryObject.transform);
-
                     
                     Invoke("EquipItem", 0.1f);
 
@@ -135,7 +139,7 @@ public class OpenContainerNewWindow : MonoBehaviour
     void IncrementNdx()
     {
         containerNdx++;
-        if (containerNdx == CONTAINERCOUNT) containerNdx = 0;
+        if (containerNdx == windowCount) containerNdx = 0;
     }
 
     void EquipItem()

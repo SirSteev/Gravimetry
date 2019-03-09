@@ -42,7 +42,9 @@ namespace PowerGridInventory.Editor
                     EditorGUI.indentLevel++;
                     TargetItem.Icon = EditorGUILayout.ObjectField(new GUIContent("Icon", "The sprite that represents this item in an inventory view."),
                                                                    TargetItem.Icon, typeof(Sprite), true) as Sprite;
-                    
+                    TargetItem.DragIcon = EditorGUILayout.ObjectField(new GUIContent("Drag Icon", "The sprite that represents this item when dragged. If left empty Icon is used"),
+                                                                   TargetItem.DragIcon, typeof(Sprite), true) as Sprite;
+
                     EditorGUI.indentLevel--;
 
                 }
