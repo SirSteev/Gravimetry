@@ -14,6 +14,7 @@ public class OpenContainerNewWindow : MonoBehaviour
     public GameObject playerInventoryObject;
     
     RectTransform panelRect;
+    RectTransform canvasRect;
 
     public int windowCount = 2;
     ContainerHandeler[] containerHandelers;
@@ -29,6 +30,14 @@ public class OpenContainerNewWindow : MonoBehaviour
         openContainerWindows = new GameObject[windowCount];
         containerHandelers = new ContainerHandeler[windowCount];
         itemContainers = new ItemContainer[windowCount];
+
+        GameObject canvas = gameObject;
+        while (canvas.name != "Canvas")
+        {
+            canvas = canvas.transform.parent.gameObject;
+        }
+
+        canvasRect = canvas.GetComponent<RectTransform>();
     }
 
     private void Update()
@@ -44,7 +53,7 @@ public class OpenContainerNewWindow : MonoBehaviour
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
         
-        if (slot.Item.gameObject.transform.parent != null && slot.Item.gameObject.transform.parent.gameObject.GetComponent<ContainerHandeler>() != null)
+        if (slot.Item != null && slot.Item.gameObject.transform.parent != null && slot.Item.gameObject.transform.parent.gameObject.GetComponent<ContainerHandeler>() != null)
         {
             Debug.Log("IM IN A BOX NO CAN OPEN");
             return;
@@ -85,7 +94,9 @@ public class OpenContainerNewWindow : MonoBehaviour
 
                         panelRect = closeContainerWindow.panelRect;
                         panelRect.sizeDelta += new Vector2(itemContainers[ndx].sizeDelta.x, 0);
-                        
+
+                        panelRect.gameObject.GetComponent<DragPanel>().constraintsTransform = canvasRect;
+
                         containerHandelers[ndx].closeContainerWindow = closeContainerWindow;
                         
                         openContainerWindows[ndx].SetActive(true);
@@ -114,7 +125,7 @@ public class OpenContainerNewWindow : MonoBehaviour
                     openContainers[containerNdx] = _slot.Item.gameObject;
 
                     if (openContainerWindows[containerNdx] == null)
-                        openContainerWindows[containerNdx] = Instantiate(openContainerPreFab, playerInventoryObject.transform);
+                        openContainerWindows[containerNdx] = Instantiate(openContainerPreFab, playerInventoryObject.transform.parent.transform);
                     
                     Invoke("EquipItem", 0.1f);
 
@@ -169,7 +180,9 @@ public class OpenContainerNewWindow : MonoBehaviour
         
         panelRect = openContainerWindows[containerNdx].GetComponent<CloseContainerWindow>().panelRect;
         panelRect.sizeDelta += new Vector2(itemContainers[containerNdx].sizeDelta.x, 0);
-        
+
+        panelRect.gameObject.GetComponent<DragPanel>().constraintsTransform = canvasRect;
+
         if (!openContainerWindows[containerNdx].activeInHierarchy)
             openContainerWindows[containerNdx].SetActive(true);
 

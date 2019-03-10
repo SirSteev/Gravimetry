@@ -3,16 +3,70 @@ using System.Collections.Generic;
 using UnityEngine;
 using PowerGridInventory;
 
+public class TimerItem
+{
+    public float unequipLockTimer;
+    public float equipLockTimer;
+
+    public PGISlot slot;
+
+    EquipUnequipTimer observer;
+
+    public TimerItem(EquipUnequipTimer _observer, PGISlot _slot)
+    {
+        slot = _slot;
+        observer = _observer;
+    }
+
+    public void UpdateEquipTimer(float _time)
+    {
+        equipLockTimer = _time;
+    }
+
+    public void UpdateUnequipTimer(float _time)
+    {
+        unequipLockTimer = _time;
+    }
+
+    public void FixedUpdate(float _elapsedTime)
+    {
+        if (slot != null)
+        {
+            if (equipLockTimer > 0 && slot.Blocked)
+            {
+                equipLockTimer -= _elapsedTime;
+
+                if (equipLockTimer <= 0)
+                {
+                    slot.Blocked = false;
+                    slot.UpdateSlot();
+                }
+            }
+
+            if (unequipLockTimer > 0 && slot.Blocked)
+            {
+                unequipLockTimer -= _elapsedTime;
+
+                if (unequipLockTimer <= 0)
+                {
+                    slot.Blocked = false;
+                    slot.UpdateSlot();
+
+                    observer.SubjectComplete(this);
+                }
+            }
+        }
+    }
+}
+    
 public class EquipUnequipTimer : MonoBehaviour
 {
     public float equipLockTime;
-    float equipLockTimer;
-
+    
     public float unequipLockTime;
-    float unequipLockTimer;
-
-    public PGISlot _slot;
-
+    
+    List<TimerItem> timers = new List<TimerItem>();
+    
     void Start()
     {
         PGISlotItem slotItem = gameObject.GetComponent<PGISlotItem>();
@@ -25,31 +79,15 @@ public class EquipUnequipTimer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_slot != null)
+        for (int ndx = 0; ndx < timers.Count; ndx++)
         {
-            if (equipLockTimer > 0 && _slot.Blocked)
-            {
-                equipLockTimer -= Time.deltaTime;
-
-                if (equipLockTimer <= 0)
-                {
-                    _slot.Blocked = false;
-                    _slot.UpdateSlot();
-                }
-            }
-
-            if (unequipLockTimer > 0 && _slot.Blocked)
-            {
-                unequipLockTimer -= Time.deltaTime;
-
-                if (unequipLockTimer <= 0)
-                {
-                    _slot.Blocked = false;
-                    _slot.UpdateSlot();
-                    _slot = null;
-                }
-            }
+            timers[ndx].FixedUpdate(Time.deltaTime);
         }
+    }
+
+    public void SubjectComplete(TimerItem _self)
+    {
+        timers.Remove(_self);
     }
 
     public void OnEquip(PGISlotItem item, PGIModel inv, PGISlot slot)
@@ -57,26 +95,35 @@ public class EquipUnequipTimer : MonoBehaviour
         if (!this.enabled || (slot.gameObject.transform.parent != null && slot.gameObject.transform.parent.gameObject.GetComponent<CloseContainerWindow>()))
             return;
 
-        _slot = slot;
+        TimerItem timerItem = new TimerItem(this, slot);
 
-        _slot.Blocked = true;
+        timers.Add(timerItem);
 
-        _slot.UpdateSlot();
+        slot.Blocked = true;
 
-        equipLockTimer = equipLockTime;
+        slot.UpdateSlot();
+
+        timerItem.UpdateEquipTimer(equipLockTime);
     }
 
     public void OnUnequip(PGISlotItem item, PGIModel inv, PGISlot slot)
     {
         if (!this.enabled || (slot.gameObject.transform.parent != null && slot.gameObject.transform.parent.gameObject.GetComponent<CloseContainerWindow>()))
             return;
-
-        _slot = slot;
-
-        _slot.Blocked = true;
-
-        _slot.UpdateSlot();
         
-        unequipLockTimer = unequipLockTime;
+        foreach (var timer in timers)
+        {
+            if (timer.slot == slot)
+            {
+                slot.Blocked = true;
+                slot.UpdateSlot();
+
+                timer.UpdateUnequipTimer(unequipLockTime);
+
+                return;
+            }
+        }
+
+        Debug.Log(slot.gameObject.name + " is missing from list on " + gameObject.name);
     }
 }
