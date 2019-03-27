@@ -59,6 +59,8 @@ public class HierarchyLinkedEquipSlot : MonoBehaviour
                 //due to the changes made for the 3D icon system and the highlight colors
                 //used by items when equipped to slots.
                 if (linked.Blocked) linked.Blocked = false;
+
+                if (linked.Item != null) break;
             }
         }
     }

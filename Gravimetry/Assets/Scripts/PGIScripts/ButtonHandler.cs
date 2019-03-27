@@ -13,7 +13,7 @@ public class ButtonHandler : MonoBehaviour
     
     public void ButtonPress(GameObject button)
     {
-        Debug.Log(button.name + " was pressed");
+        //Debug.Log(button.name + " was pressed");
 
         if (buttons.Contains(button))
         {

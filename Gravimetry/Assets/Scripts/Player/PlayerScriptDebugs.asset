@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95e903ddb92e27f47afbf5a9e2c56e17, type: 3}
   m_Name: PlayerScriptDebugs
   m_EditorClassIdentifier: 
-  debugPlayerGravity: 1
+  debugPlayerGravity: 0
   debugPlayerMovement: 0
   debugPlayerMouseLook: 0

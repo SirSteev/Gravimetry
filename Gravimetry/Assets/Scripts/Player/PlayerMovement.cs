@@ -38,12 +38,15 @@ public class PlayerMovement : MonoBehaviour
     bool running = false;
     [HideInInspector]
     public bool isGrounded = false;
+    public bool isUpRight = false;
 
     List<Collider> feetTriggerList;
 
     private void Start()
     {
         feetTriggerList = new List<Collider>();
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
@@ -122,6 +125,7 @@ public class PlayerMovement : MonoBehaviour
             playerGravity.isRotating = true;
             playerMouseLook.ChangeGravity();
             rigbod.AddForce(gravity.GetPreviousFallDirectionVector() * playerStats.JumpStrength);
+            isUpRight = false;
         }
 
         if (moving) moving = false;
@@ -129,21 +133,27 @@ public class PlayerMovement : MonoBehaviour
         Vector3 f = playerBodyShell.transform.rotation.eulerAngles;
         Vector3 u = Quaternion.LookRotation(playerForward, -gravity.GravityDirection).eulerAngles;
 
-        if (isGrounded && playerBodyShell.transform.rotation != Quaternion.LookRotation(-gravity.GravityDirection))
+        if (isGrounded && !isUpRight)
         {
             if (debugStuff.debugPlayerMovement) Debug.Log("grounded and not upright");
 
-            float dot = Vector3.Dot(-gravity.GravityDirection, playerForward) / gravity.GravityDirection.magnitude;
-            Vector3 newPos = playerForwardObject.transform.position + (gravity.GravityDirection * dot);
+            float dot = Mathf.Abs(Vector3.Dot(-gravity.GravityDirection, playerForward) / -gravity.GravityDirection.magnitude);
+            Vector3 newPos = playerForwardObject.transform.position + (-gravity.GravityDirection * dot);
             Vector3 newForward = newPos - playerBodyShell.transform.position;
             newForward = newForward.normalized;
 
             Quaternion dirQ = Quaternion.LookRotation(newForward, -gravity.GravityDirection); // what direction i want
-            Quaternion slerp = Quaternion.Slerp(playerBodyShell.transform.rotation, dirQ, rigbod.velocity.magnitude / gravity.RotationSpeed * Time.deltaTime); // rotates to it over time
+            Quaternion slerp = Quaternion.Slerp(playerBodyShell.transform.rotation, dirQ, gravity.RotationSpeed * Time.deltaTime); // rotates to it over time
 
 
-            if (dot > 0.01)
+            if (dot > 0.001)
+            {
                 playerBodyShell.transform.rotation = slerp;
+            }
+            else
+            {
+                isUpRight = true;
+            }
         }
     }
 

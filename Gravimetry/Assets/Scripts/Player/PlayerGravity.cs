@@ -47,8 +47,10 @@ public class PlayerGravity : MonoBehaviour
         playerUp = playerUp.normalized;
 
 
-        float dot = Vector3.Dot(-gravity.GravityDirection, playerMovement.playerForward) / gravity.GravityDirection.magnitude;
-        Vector3 newPos = playerMovement.playerForwardObject.transform.position + (gravity.GravityDirection * dot);
+        float dot = Vector3.Dot(-gravity.GravityDirection, playerMovement.playerForward) / -gravity.GravityDirection.magnitude;
+
+        Vector3 newPos = playerMovement.playerForwardObject.transform.position + (-gravity.GravityDirection * dot);
+
         Vector3 newForward = newPos - playerBodyShell.transform.position;
         newForward = newForward.normalized;
 
@@ -76,8 +78,10 @@ public class PlayerGravity : MonoBehaviour
                 Debug.Log("dirQ: " + dirQ.eulerAngles);
                 Debug.Log("PlayerBody Rotation: " + playerBodyShell.transform.rotation.eulerAngles + " / slerp: " + slerp.eulerAngles);
             }
-            
-            playerBodyShell.transform.rotation = slerp;
+
+            if (isRotating)
+                playerBodyShell.transform.rotation = slerp;
+                
         }
     }
     

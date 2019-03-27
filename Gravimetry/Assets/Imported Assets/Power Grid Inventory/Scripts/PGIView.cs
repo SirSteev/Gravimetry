@@ -1004,7 +1004,7 @@ namespace PowerGridInventory
 
             if (eventData.button == PointerEventData.InputButton.Right && DraggedItem != null && slot != null)
             {
-                Debug.Log("Ding");
+                //Debug.Log("Ding");
                 if (DraggedItem.Item.RotatedDir == PGISlotItem.RotateDirection.None) DraggedItem.Item.Rotate(PGISlotItem.RotateDirection.CW);
                 else DraggedItem.Item.Rotate(PGISlotItem.RotateDirection.None);
 

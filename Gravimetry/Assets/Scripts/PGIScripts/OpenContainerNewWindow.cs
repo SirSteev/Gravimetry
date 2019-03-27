@@ -189,6 +189,7 @@ public class OpenContainerNewWindow : MonoBehaviour
         closeContainerWindow.icon.sprite = null;
         closeContainerWindow.icon.sprite = _slot.Item.Icon;
 
+        openContainerWindows[containerNdx].transform.SetSiblingIndex(0);
         openContainerWindows[containerNdx].transform.SetSiblingIndex(openContainerWindows[containerNdx].transform.parent.transform.childCount - 1);
 
         IncrementNdx();

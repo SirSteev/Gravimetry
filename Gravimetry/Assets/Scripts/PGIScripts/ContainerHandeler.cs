@@ -8,6 +8,7 @@ public class ContainerHandeler : MonoBehaviour
 {
     public List<PGIModel> models = new List<PGIModel>();
     public List<Vector2> modelStartPositions = new List<Vector2>();
+    [HideInInspector]
     public CloseContainerWindow closeContainerWindow;
 
     private void Start()
