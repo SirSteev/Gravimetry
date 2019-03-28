@@ -49,7 +49,7 @@ public class TimerItem
 
                 if (unequipLockTimer <= 0)
                 {
-                    slot.Blocked = false;
+                    if (slot.Blocked) slot.Blocked = false;
                     slot.UpdateSlot();
 
                     observer.SubjectComplete(this);

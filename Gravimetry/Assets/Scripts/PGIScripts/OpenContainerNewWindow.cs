@@ -66,7 +66,7 @@ public class OpenContainerNewWindow : MonoBehaviour
 
         if (clicks >= 2)
         {
-            if (slot.Item.gameObject.GetComponent<ContainerHandeler>() != null)
+            if (slot.Item != null && slot.Item.gameObject.GetComponent<ContainerHandeler>() != null)
             {
                 int ndx = -1;
                 for (int i = 0; i < openContainerWindows.Length; i++)
@@ -179,7 +179,7 @@ public class OpenContainerNewWindow : MonoBehaviour
         //closeContainerWindow.windowRect.sizeDelta -= new Vector2(0, 50);
         
         panelRect = openContainerWindows[containerNdx].GetComponent<CloseContainerWindow>().panelRect;
-        panelRect.sizeDelta += new Vector2(itemContainers[containerNdx].sizeDelta.x, 0);
+        //panelRect.sizeDelta += new Vector2(itemContainers[containerNdx].sizeDelta.x, 0);
 
         panelRect.gameObject.GetComponent<DragPanel>().constraintsTransform = canvasRect;
 

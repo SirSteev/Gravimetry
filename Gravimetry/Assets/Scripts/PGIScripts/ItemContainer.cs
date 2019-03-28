@@ -70,6 +70,8 @@ public class ItemContainer : MonoBehaviour
             containerSlot.UpdateSlot();
         }
         sizeDelta -= new Vector2(0, 50);
+
+        if (sizeDelta.y < 0) sizeDelta.y = 0;
     }
 
     public void OnUnEquip()

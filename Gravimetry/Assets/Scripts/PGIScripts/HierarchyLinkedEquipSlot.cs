@@ -8,6 +8,7 @@ public class HierarchyLinkedEquipSlot : MonoBehaviour
 {
     [Tooltip("A list of equipment slots that will become blocked when this slot is equipped with an item.")]
     public PGISlot[] LowerLinkedSlots;
+    public bool toggleAll = false;
 
     void Start()
     {
@@ -60,7 +61,7 @@ public class HierarchyLinkedEquipSlot : MonoBehaviour
                 //used by items when equipped to slots.
                 if (linked.Blocked) linked.Blocked = false;
 
-                if (linked.Item != null) break;
+                if (linked.Item != null && !toggleAll) break;
             }
         }
     }
