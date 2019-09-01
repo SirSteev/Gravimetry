@@ -27,7 +27,6 @@ namespace PowerGridInventory.Extensions.ItemFilter
             {
                 Slot.OnCanEquipItem.AddListener(CanEquip);
             }
-
         }
 
         public void CanEquip(PGISlotItem item, PGIModel inv, PGISlot slot)

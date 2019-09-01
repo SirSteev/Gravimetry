@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using PowerGridInventory;
+using UnityEngine.EventSystems;
 
 public class TimerItem
 {
@@ -49,10 +50,8 @@ public class TimerItem
 
                 if (unequipLockTimer <= 0)
                 {
-                    if (slot.Blocked) slot.Blocked = false;
+                    if (observer.SubjectComplete(this)) slot.Blocked = false;
                     slot.UpdateSlot();
-
-                    observer.SubjectComplete(this);
                 }
             }
         }
@@ -66,28 +65,51 @@ public class EquipUnequipTimer : MonoBehaviour
     public float unequipLockTime;
     
     List<TimerItem> timers = new List<TimerItem>();
-    
+
+    public int thing;
+
+    PGISlotItem slotItem;
+    PGISlot hoverSlot;
+    PGIModel _model;
+
     void Start()
     {
-        PGISlotItem slotItem = gameObject.GetComponent<PGISlotItem>();
+        slotItem = gameObject.GetComponent<PGISlotItem>();
+
         if (slotItem != null)
         {
             slotItem.OnEquip.AddListener(OnEquip);
             slotItem.OnUnequip.AddListener(OnUnequip);
+            slotItem.OnCanEquip.AddListener(OnCanEquip);
         }
     }
 
     private void FixedUpdate()
     {
-        for (int ndx = 0; ndx < timers.Count; ndx++)
+        for (int ndx = timers.Count - 1; ndx >= 0; ndx--)
         {
             timers[ndx].FixedUpdate(Time.deltaTime);
         }
+        thing = timers.Count;
     }
 
-    public void SubjectComplete(TimerItem _self)
+    public bool SubjectComplete(TimerItem _self)
     {
         timers.Remove(_self);
+        
+        slotItem.OnCanEquip.Invoke(slotItem, _model, hoverSlot);
+        hoverSlot.OnCanEquipItem.Invoke(slotItem, _model, hoverSlot);
+        if (slotItem.Equipped < 0)
+            hoverSlot.View.TimerHighlightHack(slotItem, hoverSlot);
+
+        foreach (var timer in timers)
+        {
+            if (timer.slot == _self.slot)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void OnEquip(PGISlotItem item, PGIModel inv, PGISlot slot)
@@ -98,12 +120,10 @@ public class EquipUnequipTimer : MonoBehaviour
         TimerItem timerItem = new TimerItem(this, slot);
 
         timers.Add(timerItem);
+        timerItem.UpdateEquipTimer(equipLockTime);
 
         slot.Blocked = true;
-
         slot.UpdateSlot();
-
-        timerItem.UpdateEquipTimer(equipLockTime);
     }
 
     public void OnUnequip(PGISlotItem item, PGIModel inv, PGISlot slot)
@@ -125,5 +145,17 @@ public class EquipUnequipTimer : MonoBehaviour
         }
 
         Debug.Log(slot.gameObject.name + " is missing from list on " + gameObject.name);
+    }
+
+    public void OnCanEquip(PGISlotItem slotItem, PGIModel model, PGISlot slot)
+    {
+        //Debug.Log(gameObject.name + ", " + slot.gameObject.name);
+        hoverSlot = slot;
+        _model = model;
+
+        if (timers.Count > 0)
+        {
+            model.CanPerformAction = false;
+        }
     }
 }

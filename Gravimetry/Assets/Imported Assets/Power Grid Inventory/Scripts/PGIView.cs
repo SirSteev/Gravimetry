@@ -938,6 +938,10 @@ namespace PowerGridInventory
                             bool wasRotated = !dropSlot.View.AssignItemToSlot(DraggedItem.Item, sourceSlot, DraggedItem.WasEquipped, DraggedItem.WasStored, DraggedItem.Slot);
                             HackRotateDraggedItem(wasRotated);
                             ReturnDraggedItemToSlot();
+                            //if (DraggedItem.Item.gameObject.GetComponent<EquipUnequipTimer>() != null)
+                            //{
+                            //    DraggedItem.Item.gameObject.GetComponent<EquipUnequipTimer>().AddTimer(DraggedItem.Slot);
+                            //}
                             OnDragEndInvalid.Invoke(eventData, item, sourceSlot, enteredGO);
                             DraggedItem.Item.OnDragEnd.Invoke(item, sourceSlot.Model, sourceSlot);
                         }
@@ -1000,8 +1004,6 @@ namespace PowerGridInventory
         /// <param name="eventData">Event data.</param>
         void OnClickHack(PointerEventData eventData, PGISlot slot)
         {
-            
-
             if (eventData.button == PointerEventData.InputButton.Right && DraggedItem != null && slot != null)
             {
                 //Debug.Log("Ding");
@@ -1562,6 +1564,16 @@ namespace PowerGridInventory
             return slot.View.GetSlotCell(offsetX, offsetY);
         }
 
+        public void TimerHighlightHack(PGISlotItem slotItem, PGISlot slot)
+        {
+            if (slot.Model.CanSwapIgnorePrevious(slotItem, slot))
+            {
+                slot.HighlightColor = HighlightColor;
+                UpdateView();
+                slot.UpdateSlotIcon();
+            }
+        }
+
         /// <summary>
         /// Handles highlighting effects when hovering over a grid slot
         /// while performing a drag. This method calculates
@@ -1571,7 +1583,7 @@ namespace PowerGridInventory
         /// </summary>
         /// <param name="slot">The slot that the pointer is currently over.</param>
         /// <param name="item">The item being dragged or dropped.</param>
-        void SelectSlot(PGISlot slot, PGISlotItem item)
+        public void SelectSlot(PGISlot slot, PGISlotItem item)
         {
             //if the item is too big, just highlight everything in the grid as invalid and be done with it.
             if (!slot.IsEquipmentSlot && (item.CellHeight > this.Model.GridCellsY || item.CellWidth > this.Model.GridCellsX))
@@ -1588,6 +1600,8 @@ namespace PowerGridInventory
                 else if (slot.Model.CanSwap(item, slot))
                 {
                     slot.HighlightColor = HighlightColor;
+                    UpdateView();
+                    slot.UpdateSlotIcon();
                 }
 #if !PGI_LITE
                 else if (slot.Model.CanSocket(item, slot.Item))
@@ -1598,6 +1612,8 @@ namespace PowerGridInventory
                 else
                 {
                     slot.HighlightColor = InvalidColor;
+                    UpdateView();
+                    slot.UpdateSlotIcon();
                 }
 
                 return;

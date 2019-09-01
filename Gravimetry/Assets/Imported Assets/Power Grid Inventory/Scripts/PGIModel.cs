@@ -972,6 +972,47 @@ namespace PowerGridInventory
             PreviousSwapResult.SwapSlot = null;
         }
 
+        public bool CanSwapIgnorePrevious(PGISlotItem item, PGISlot equipSlot)
+        {
+            if (item == null || equipSlot == null)
+            {
+                CanPerformAction = false;
+                return false;
+            }
+
+            if (equipSlot.Item == null)
+            {
+                _CanPerformAction = true;
+                item.TriggerCanEquipEvents(this, equipSlot);
+                PreviousSwapResult.SwapResult = CanPerformAction;
+                return CanPerformAction;
+            }
+
+
+            //The very first thing we need to do is
+            //remove our items from their positions.
+            CanPerformAction = false;
+            PGISlotItem swap = equipSlot.Item;
+            if (Unequip(swap) != null)
+            {
+                if (Equip(item, equipSlot) != null)
+                {
+                    Pos temp = FindFirstFreeSpace(swap);
+                    if (temp != null && Store(swap, temp.X, temp.Y)) //this resets 'CanPerformAction' to true
+                    {
+                        _CanPerformAction = true;
+                        Remove(swap, false);
+                    }
+                    else CanPerformAction = false; //need to do this because 'Store()' sets it to true again
+                    Unequip(item, false);
+                }
+                Equip(swap, equipSlot, false);
+            }
+
+            PreviousSwapResult.SwapResult = CanPerformAction;
+            return CanPerformAction;
+        }
+
         /// <summary>
         /// Determines if an item can be swapped with the contents of another equipment slot.
         /// </summary>
@@ -1001,8 +1042,7 @@ namespace PowerGridInventory
                 PreviousSwapResult.SwapResult = CanPerformAction;
                 return CanPerformAction;
             }
-
-
+            
 
             //The very first thing we need to do is
             //remove our items from their positions.
@@ -1953,6 +1993,13 @@ namespace PowerGridInventory
         /// at the given location. It is recommened that this be used to avoid state-corruption.</param>
         public PGISlotItem Unequip(PGISlotItem item, bool checkCanMethods = true)
         {
+            if (item.Equipped < 0)
+            {
+                //Debug.Log("poops");
+                
+                return null;
+            }
+
             _DirtyId++;
             if (checkCanMethods && !CanUnequip(item, Equipment[item.Equipped])) return null;
             Equipment[item.Equipped].AssignItem(null);
@@ -2103,6 +2150,8 @@ namespace PowerGridInventory
             //make sure we are sending the item being moved it back to the correct inventory too!
             if (sourceSlot.IsEquipmentSlot) sourceSlot.Model.Equip(sourceItem, sourceSlot, false);
             else sourceSlot.Model.Store(sourceItem, sourceSlot.xPos, sourceSlot.yPos, false);
+            
+
 
             return null;
         }

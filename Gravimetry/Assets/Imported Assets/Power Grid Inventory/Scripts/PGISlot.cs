@@ -368,6 +368,8 @@ namespace PowerGridInventory
                     if (value.a <= 0.001f) Highlight.enabled = false;
                     else Highlight.enabled = true;
                 }
+
+
             }
             get { return Highlight.color; }
         }
@@ -563,6 +565,13 @@ namespace PowerGridInventory
             }
 
             InitIcon();
+
+            UpdateSlotIcon();
+        }
+
+        private void FixedUpdate()
+        {
+            UpdateSlotIcon();
         }
 
         public void UpdateSlot()
@@ -594,6 +603,30 @@ namespace PowerGridInventory
             else if (this.View != null)
             {
                 this.HighlightColor = this.View.NormalColor;
+            }
+        }
+
+        public void UpdateSlotIcon()
+        {
+            if (_Blocked && Item != null)
+            {
+                Icon = null;
+                Icon = Item.Icon;
+            }
+            else if (_Blocked && this.View != null)
+            {
+                Icon = null;
+                Icon = DefaultIcon;
+            }
+            else if (Item != null)
+            {
+                Icon = null;
+                Icon = Item.Icon;
+            }
+            else if (!_Blocked && Item == null)
+            {
+                Icon = null;
+                Icon = DefaultIcon;
             }
         }
 
